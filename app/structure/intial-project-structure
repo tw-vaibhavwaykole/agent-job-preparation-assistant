@@ -1,0 +1,22 @@
+job-prep-assistant/
+├── app/
+│ ├── init.py
+│ ├── models.py
+│ ├── routes/
+│ │ ├── auth.py
+│ │ ├── main.py
+│ │ ├── study.py
+│ │ ├── tests.py
+│ │ ├── resume.py
+│ │ └── jobs.py
+│ ├── templates/
+│ │ ├── base.html
+│ │ ├── auth/
+│ │ ├── main/
+│ │ └── ...
+│ └── static/
+├── tests/
+├── migrations/
+├── setup.py
+├── requirements.txt
+└── README.md

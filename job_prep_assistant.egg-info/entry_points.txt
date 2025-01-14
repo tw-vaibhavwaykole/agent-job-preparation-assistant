@@ -1,0 +1,2 @@
+[console_scripts]
+job-prep-assistant = app:create_app

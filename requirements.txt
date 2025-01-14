@@ -1,0 +1,33 @@
+# Core Flask Dependencies
+Flask==3.1.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-Bcrypt==1.0.1
+Flask-Migrate==4.0.7
+Flask-WTF==1.1.2
+Werkzeug==3.1.3
+SQLAlchemy==2.0.37
+
+# Database
+alembic==1.12.1
+
+# AI Integration
+openai==1.59.7
+
+# PDF Generation
+reportlab==4.2.5
+Pillow==10.1.0
+
+# Environment and Configuration
+python-dotenv==1.0.1
+
+# Development Tools
+pytest==7.4.3
+black==23.9.0
+flake8==6.1.0
+
+# Security
+email-validator==2.1.0
+
+# Utilities
+requests==2.32.0

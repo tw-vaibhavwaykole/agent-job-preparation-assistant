@@ -1,0 +1,25 @@
+job-prep-assistant/
+├── app/
+│ ├── init.py # Application factory and extensions
+│ ├── models.py # Database models
+│ ├── routes/
+│ │ ├── auth.py # Authentication routes
+│ │ ├── main.py # Main application routes
+│ │ ├── study.py # Study materials
+│ │ ├── tests.py # Mock tests
+│ │ ├── resume.py # Resume builder
+│ │ └── jobs.py # Job recommendations
+│ ├── templates/
+│ │ ├── base.html # Base template
+│ │ ├── auth/ # Authentication templates
+│ │ ├── main/ # Main page templates
+│ │ ├── study/ # Study material templates
+│ │ ├── tests/ # Test templates
+│ │ ├── resume/ # Resume builder templates
+│ │ └── jobs/ # Job recommendation templates
+│ └── static/ # Static assets (CSS, JS, images)
+├── tests/ # Test suite
+├── migrations/ # Database migrations
+├── setup.py # Package configuration
+├── requirements.txt # Dependencies
+└── README.md # Documentation

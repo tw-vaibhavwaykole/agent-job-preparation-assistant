@@ -1,0 +1,58 @@
+You are an expert Python developer and architect. Create a prototype for a GitHub project named "job-prep-assistant" that serves as a **Job Preparation and Placement Assistant**. The application should be written in Python, extensible for future scalability, and designed with the following features:
+
+### Features to Implement:
+1. **User Registration & Authentication:**
+   - Allow users to register and log in using their email or phone number.
+   - Use a lightweight authentication system (e.g., Flask-Login).
+
+2. **Study Material Recommendations:**
+   - Allow users to select their areas of interest (e.g., Competitive Exams, Government Jobs, Private Sector Interviews).
+   - Provide sample study materials and links to external resources categorized by topic.
+
+3. **Mock Test Generator:**
+   - Include a feature to generate mock tests dynamically with multiple-choice questions (MCQs) and time-based assessments.
+   - Store test data locally or in a SQLite database for simplicity.
+
+4. **Resume Builder:**
+   - Allow users to input their details and generate a basic resume in PDF format.
+
+5. **Job Recommendations:**
+   - Implement a placeholder for fetching job recommendations based on user input (e.g., job role, location, salary preference).
+   - Use dummy data for now, with a placeholder API structure for future integration.
+
+6. **Scalable Design:**
+   - Use modular architecture so that additional features (like interview tips, analytics, or advanced AI support) can be added later.
+
+7. **Basic UI:**
+   - Create a minimal front-end using Flask with templates for user interaction (e.g., Bootstrap for styling).
+
+8. **Claude Sonnet Integration:**
+   - Include a Python script to connect with Claude Sonnet 3.5 for generating personalized job preparation tips and mock interview questions based on user input.
+
+9. **Documentation:**
+   - Add a clear README file with instructions for setting up and running the application locally.
+   - Include instructions for how to extend the project in the future.
+
+### Technical Stack:
+- **Backend**: Python (Flask Framework).
+- **Database**: SQLite for prototyping.
+- **Front-End**: Flask templates with Bootstrap for a responsive UI.
+- **AI Integration**: Claude Sonnet 3.5 for generating insights.
+- **Deployment**: Instructions for running locally or on a lightweight service like Heroku.
+
+### GitHub Repository Structure:
+- `/app`: Core application code (Flask app, routes, models).
+- `/templates`: HTML templates for the front-end.
+- `/static`: CSS, JS, and other static assets.
+- `/mock_data`: Sample data files for testing (e.g., job roles, mock test questions).
+- `/scripts`: Python scripts for integrating Claude Sonnet and other utilities.
+- `README.md`: Detailed setup guide.
+- `requirements.txt`: Python dependencies.
+- `.env.example`: Sample environment variables for local testing.
+
+### Output:
+- Generate a ZIP file of the GitHub repository with all the necessary code files and folder structure.
+- Include placeholder code wherever necessary for extensibility.
+- Provide a concise summary of the project’s features and setup steps in the README.md.
+
+Start now and ensure the project is simple to run and extend while demonstrating the core functionalities clearly.

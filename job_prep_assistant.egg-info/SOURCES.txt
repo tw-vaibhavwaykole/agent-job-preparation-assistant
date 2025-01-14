@@ -1,0 +1,10 @@
+README.md
+setup.py
+app/__init__.py
+app/models.py
+job_prep_assistant.egg-info/PKG-INFO
+job_prep_assistant.egg-info/SOURCES.txt
+job_prep_assistant.egg-info/dependency_links.txt
+job_prep_assistant.egg-info/entry_points.txt
+job_prep_assistant.egg-info/requires.txt
+job_prep_assistant.egg-info/top_level.txt
