@@ -17,11 +17,12 @@ sdist/
 var/
 wheels/
 *.egg-info/
+job_prep_assistant.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# Virtual Environment
+# Virtual git ironment
 venv/
 env/
 ENV/

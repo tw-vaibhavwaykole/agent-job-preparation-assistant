@@ -17,9 +17,25 @@ class User(UserMixin, db.Model):
 class StudyMaterial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
-    category = db.Column(db.String(64), nullable=False)
     content = db.Column(db.Text)
-    external_link = db.Column(db.String(256))
+    content_type = db.Column(db.String(20))  # 'text', 'pdf', 'video', 'code'
+    file_path = db.Column(db.String(256))    # For uploaded files
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    
+    # AI-related fields
+    ai_summary = db.Column(db.Text)          # AI-generated summary
+    keywords = db.Column(db.JSON)            # Extracted keywords
+    difficulty_level = db.Column(db.String(20))
+    estimated_time = db.Column(db.Integer)    # in minutes
+
+class StudyMaterialContent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    material_id = db.Column(db.Integer, db.ForeignKey('study_material.id'))
+    content_type = db.Column(db.String(20))
+    content = db.Column(db.Text)
+    file_path = db.Column(db.String(256))
+    order = db.Column(db.Integer)
 
 class MockTest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
