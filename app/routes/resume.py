@@ -1,9 +1,7 @@
 from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required, current_user
-from reportlab.pdfgen import canvas
+from app.models.resume import Resume
 from io import BytesIO
-import json
-from app.models.resume import Resume, Experience, Education, Skill
 
 bp = Blueprint('resume', __name__, url_prefix='/resume')
 
@@ -19,15 +17,9 @@ def generate():
     
     # Create PDF using ReportLab
     buffer = BytesIO()
-    p = canvas.Canvas(buffer)
-    
-    # Add content to PDF
-    p.drawString(100, 800, f"Name: {data['name']}")
-    p.drawString(100, 780, f"Email: {data['email']}")
-    # Add more resume sections...
-    
-    p.save()
+    # Add PDF generation logic here
     buffer.seek(0)
+    
     return send_file(
         buffer,
         as_attachment=True,

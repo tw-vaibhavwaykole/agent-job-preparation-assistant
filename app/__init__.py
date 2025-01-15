@@ -47,7 +47,7 @@ def create_app():
         from app.routes import main, auth, study, tests, resume, jobs
         app.register_blueprint(main.main_bp)
         app.register_blueprint(auth.auth_bp)
-        app.register_blueprint(study.study_bp)
+        app.register_blueprint(study.bp)
         app.register_blueprint(tests.bp)
         app.register_blueprint(resume.bp)
         app.register_blueprint(jobs.bp)

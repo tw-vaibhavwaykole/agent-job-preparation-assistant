@@ -3,32 +3,37 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2>Welcome, {{ current_user.name }}!</h2>
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Study Materials</h5>
-                <p class="card-text">Access study materials and resources.</p>
-                <a href="{{ url_for('study.materials') }}" class="btn btn-primary">View Materials</a>
+<div class="container">
+    <h1>Welcome, {{ current_user.username }}!</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Study Materials</h5>
+                    <p class="card-text">Access your study materials and resources.</p>
+                    <a href="{{ url_for('study.list_study_materials') }}" class="btn btn-primary">View Materials</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Mock Tests</h5>
-                <p class="card-text">Practice with mock tests.</p>
-                <a href="{{ url_for('tests.list') }}" class="btn btn-primary">Take Tests</a>
+        
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mock Tests</h5>
+                    <p class="card-text">Practice with mock tests.</p>
+                    <a href="{{ url_for('tests.index') }}" class="btn btn-primary">Take Tests</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Resume Builder</h5>
-                <p class="card-text">Create your professional resume.</p>
-                <a href="{{ url_for('resume.builder') }}" class="btn btn-primary">Build Resume</a>
+        
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Resume Builder</h5>
+                    <p class="card-text">Create and manage your resume.</p>
+                    <a href="{{ url_for('resume.builder') }}" class="btn btn-primary">Build Resume</a>
+                </div>
             </div>
         </div>
     </div>
