@@ -1,30 +1,78 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_login import login_required, current_user
-from app.models import MockTest, Question
-from app import db
+from app.models import MockTest, Question, Answer, TestResult
 
-bp = Blueprint('tests', __name__, url_prefix='/tests')
+tests_bp = Blueprint('tests', __name__)
 
-@bp.route('/list')
+@tests_bp.route('/tests', methods=['GET'])
 @login_required
-def list():
-    tests = MockTest.query.all()
-    return render_template('tests/list.html', tests=tests)
+def list_tests():
+    db = current_app.db.session
+    tests = db.query(MockTest).all()
+    return jsonify([test.to_dict() for test in tests])
 
-@bp.route('/<int:id>')
+@tests_bp.route('/tests/<int:test_id>', methods=['GET'])
 @login_required
-def take_test(id):
-    test = MockTest.query.get_or_404(id)
-    return render_template('tests/take.html', test=test)
+def get_test(test_id):
+    db = current_app.db.session
+    test = db.query(MockTest).filter(MockTest.id == test_id).first()
+    if not test:
+        return jsonify({'error': 'Test not found'}), 404
+    return jsonify(test.to_dict())
 
-@bp.route('/<int:id>/submit', methods=['POST'])
+@tests_bp.route('/tests/<int:test_id>/start', methods=['POST'])
 @login_required
-def submit_test(id):
-    test = MockTest.query.get_or_404(id)
-    answers = request.get_json()
-    score = 0
-    for question in test.questions:
-        if str(question.id) in answers:
-            if answers[str(question.id)] == question.correct_answer:
-                score += 1
-    return jsonify({'score': score, 'total': len(test.questions)}) 
+def start_test(test_id):
+    db = current_app.db.session
+    test = db.query(MockTest).filter(MockTest.id == test_id).first()
+    if not test:
+        return jsonify({'error': 'Test not found'}), 404
+    
+    # Get questions for the test
+    questions = db.query(Question).filter(Question.test_id == test_id).all()
+    return jsonify({
+        'test': test.to_dict(),
+        'questions': [q.to_dict() for q in questions]
+    })
+
+@tests_bp.route('/tests/<int:test_id>/submit', methods=['POST'])
+@login_required
+def submit_test(test_id):
+    db = current_app.db.session
+    answers_data = request.json.get('answers', [])
+    
+    total_marks = 0
+    for answer_data in answers_data:
+        answer = Answer(
+            question_id=answer_data['question_id'],
+            user_id=current_user.id,
+            answer_text=answer_data['answer_text']
+        )
+        db.add(answer)
+        
+        # Calculate marks
+        question = db.query(Question).get(answer_data['question_id'])
+        if question and answer_data['answer_text'].lower() == question.correct_answer.lower():
+            answer.is_correct = True
+            answer.marks_obtained = question.marks
+            total_marks += question.marks
+        else:
+            answer.is_correct = False
+            answer.marks_obtained = 0
+    
+    # Create test result
+    test = db.query(MockTest).get(test_id)
+    percentage = (total_marks / test.total_marks) * 100 if test.total_marks > 0 else 0
+    
+    result = TestResult(
+        test_id=test_id,
+        user_id=current_user.id,
+        total_marks_obtained=total_marks,
+        percentage=percentage,
+        passed=percentage >= test.passing_marks
+    )
+    
+    db.add(result)
+    db.commit()
+    
+    return jsonify(result.to_dict()) 

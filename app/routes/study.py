@@ -1,85 +1,109 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+from flask import Blueprint, request, jsonify, current_app
+from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
-from app.models import StudyMaterial
-from app import db
-from app.utils.file_handler import FileHandler
-from app.utils.ai_content_analyzer import AIContentAnalyzer
+from app.models.study_material import StudyMaterial, UserProgress, Bookmark
+from app.services.ai_service import analyze_content, generate_summary
+import os
 
-bp = Blueprint('study', __name__, url_prefix='/study')
+study_bp = Blueprint('study', __name__)
 
-@bp.route('/materials')
+@study_bp.route('/upload', methods=['POST'])
 @login_required
-def materials():
-    categories = ['Competitive Exams', 'Government Jobs', 'Private Sector']
-    materials = StudyMaterial.query.all()
-    return render_template('study/materials.html', materials=materials, categories=categories)
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+        
+    if file:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        return jsonify({'message': 'File uploaded successfully'})
 
-@bp.route('/materials/<int:id>')
+@study_bp.route("/materials/", methods=['POST'])
 @login_required
-def material_detail(id):
-    material = StudyMaterial.query.get_or_404(id)
-    return render_template('study/detail.html', material=material)
+def create_study_material():
+    if not current_user.can_create_material:
+        return jsonify({'error': 'Not authorized to create materials'}), 403
 
-@bp.route('/materials/add', methods=['GET', 'POST'])
-@login_required
-def add_material():
-    if request.method == 'POST':
-        material = StudyMaterial(
-            title=request.form['title'],
-            category=request.form['category'],
-            content=request.form['content'],
-            external_link=request.form['external_link']
-        )
-        db.session.add(material)
-        db.session.commit()
-        flash('Study material added successfully!')
-        return redirect(url_for('study.materials'))
-    return render_template('study/add.html')
-
-@bp.route('/materials/upload', methods=['POST'])
-@login_required
-def upload_material():
-    try:
+    # Handle file upload if provided
+    file_path = None
+    if 'file' in request.files:
         file = request.files['file']
-        content = request.form.get('content')
-        title = request.form.get('title')
-        
-        # Save file if provided
-        file_path = None
-        if file:
-            file_path = FileHandler.save_file(file)
-        
-        # Analyze content with AI
-        ai_analyzer = AIContentAnalyzer()
-        analysis = ai_analyzer.analyze_content(content or file_path, 
-                                            content_type=file.content_type if file else 'text')
-        
-        # Create study material
-        material = StudyMaterial(
-            title=title,
-            content=content,
-            file_path=file_path,
-            ai_summary=analysis.get('summary'),
-            keywords=analysis.get('keywords'),
-            difficulty_level=analysis.get('difficulty_level'),
-            estimated_time=analysis.get('estimated_time')
-        )
-        
-        db.session.add(material)
-        db.session.commit()
-        
-        return jsonify({"success": True, "material_id": material.id})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        if file.filename:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
-@bp.route('/materials/search', methods=['GET'])
+    # Analyze content if provided
+    analysis = {}
+    if 'content' in request.form:
+        content = request.form['content']
+        analysis = analyze_content(content)
+
+    # Create study material
+    db = current_app.db.session
+    db_material = StudyMaterial(
+        title=request.form['title'],
+        content_type=request.form['content_type'],
+        content=request.form['content'],
+        file_path=file_path,
+        **analysis
+    )
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return jsonify(db_material.to_dict())
+
+@study_bp.route("/materials/", methods=['GET'])
 @login_required
-def search_materials():
-    query = request.args.get('q', '')
-    try:
-        # AI-powered search
-        ai_analyzer = AIContentAnalyzer()
-        search_results = ai_analyzer.search_materials(query)
-        return jsonify(search_results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500 
+def list_study_materials():
+    db = current_app.db.session
+    query = db.query(StudyMaterial)
+    if 'search' in request.args:
+        query = query.filter(StudyMaterial.title.ilike(f"%{request.args['search']}%"))
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    materials = query.offset((page - 1) * per_page).limit(per_page).all()
+    return jsonify([m.to_dict() for m in materials])
+
+@study_bp.route("/materials/<int:material_id>/progress", methods=['GET'])
+@login_required
+def get_progress(material_id):
+    db = current_app.db.session
+    progress = db.query(UserProgress).filter(
+        UserProgress.user_id == current_user.id,
+        UserProgress.material_id == material_id
+    ).first()
+    
+    if not progress:
+        progress = UserProgress(
+            user_id=current_user.id,
+            material_id=material_id
+        )
+        db.add(progress)
+        db.commit()
+        db.refresh(progress)
+    return jsonify(progress.to_dict())
+
+@study_bp.route("/materials/<int:material_id>/bookmark", methods=['POST'])
+@login_required
+def toggle_bookmark(material_id):
+    db = current_app.db.session
+    bookmark = db.query(Bookmark).filter(
+        Bookmark.user_id == current_user.id,
+        Bookmark.material_id == material_id
+    ).first()
+    
+    if bookmark:
+        db.delete(bookmark)
+        db.commit()
+        return jsonify({'status': 'unbookmarked'})
+    
+    bookmark = Bookmark(user_id=current_user.id, material_id=material_id)
+    db.add(bookmark)
+    db.commit()
+    return jsonify({'status': 'bookmarked'}) 
