@@ -1,26 +1,16 @@
 from .user import User
-from .study_material import StudyMaterial, UserProgress, Bookmark, Note, Rating
+from .study_material import StudyMaterial
+from .resume import Resume
 from .mock_test import MockTest, Question, Answer, TestResult
+from .job import Job
 
-from .resume import Resume, Experience, Education, Skill
-from .job import Job, Application, Interview
-# Export all models
 __all__ = [
-    'User',
-    'StudyMaterial',
-    'UserProgress',
-    'Bookmark',
-    'Note',
-    'Rating',
-    'MockTest',
-    'Question',
-    'Answer',
+    'User', 
+    'StudyMaterial', 
+    'Resume', 
+    'MockTest', 
+    'Question', 
+    'Answer', 
     'TestResult',
-    'Resume',
-    'Experience',
-    'Education',
-    'Skill',
-    'Job',
-    'Application',
-    'Interview'
+    'Job'
 ] 

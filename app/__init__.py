@@ -33,8 +33,8 @@ def create_app():
     login_manager.login_message_category = 'info'
     
     with app.app_context():
-        # Import models to ensure they're known to Flask-Migrate
-        from app.models import User
+        # Import all models to ensure they're known to Flask-Migrate
+        from app.models import User, MockTest, Question, Answer, TestResult
         
         @login_manager.user_loader
         def load_user(user_id):
@@ -48,7 +48,7 @@ def create_app():
         app.register_blueprint(main.main_bp)
         app.register_blueprint(auth.auth_bp)
         app.register_blueprint(study.study_bp)
-        app.register_blueprint(tests.tests_bp)
+        app.register_blueprint(tests.bp)
         app.register_blueprint(resume.bp)
         app.register_blueprint(jobs.bp)
         

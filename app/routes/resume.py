@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import json
+from app.models.resume import Resume, Experience, Education, Skill
 
 bp = Blueprint('resume', __name__, url_prefix='/resume')
 
